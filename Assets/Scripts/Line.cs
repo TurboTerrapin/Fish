@@ -107,7 +107,7 @@ public class Line : MonoBehaviour
     }
     public void RemovePointFromEnd()
     {
-        if (points.Count > 1 && sticks.Count > 1)
+        if (points.Count > 2 && sticks.Count > 1)
         {
             //sticks.RemoveAt(this.sticks.Count - 1);
 

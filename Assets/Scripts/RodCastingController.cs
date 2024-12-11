@@ -14,6 +14,7 @@ public class RodCastingController : MonoBehaviour
     public bool growing = true;
     public bool isReeling = false;
     public bool justReturned = false;
+    public bool lockedBail = true;
 
     public Line lineController = null;
 
@@ -53,7 +54,7 @@ public class RodCastingController : MonoBehaviour
                 WindUp();
             }
         }
-        else if (hook.GetComponent<Hook>().landed && dir.magnitude > lineController.length + 1.5)
+        else if (hook.GetComponent<Hook>().landed && !lockedBail && dir.magnitude > lineController.length + 1.5)
         {
             lineController.AddPointToEnd();
         }
@@ -97,10 +98,12 @@ public class RodCastingController : MonoBehaviour
 
         hook.GetComponent<Rigidbody>().AddForce(mainCamera.transform.forward * force, ForceMode.Impulse);
         isReeling = true;
+        lockedBail = false;
     }
 
     void Reel()
     {
+        lockedBail = true;
         if ((transform.position - hook.transform.position).magnitude < 5)
         {
             hook.SetActive(false);
@@ -136,6 +139,7 @@ public class RodCastingController : MonoBehaviour
     void Release()
     {
         lineController.AddPointToEnd();
+        lockedBail = false;
     }
 
 }

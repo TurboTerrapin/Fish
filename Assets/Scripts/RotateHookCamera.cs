@@ -9,7 +9,7 @@ public class RotateHookCamera : MonoBehaviour
     public float mouseSensitivity = 100f;
     public Vector2 prevPos = Vector2.zero;
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
         //Gets mouse input
         mouseMove = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));

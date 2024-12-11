@@ -59,7 +59,9 @@ public class Boid : MonoBehaviour
     {
         Debug.DrawRay(transform.position, transform.forward * 10);
         timer += Time.fixedDeltaTime;
+        
 
+        //Get a new random speed and direction
         if (timer > timerInterval)
         {
             NewSpeedAndDirection();
@@ -67,6 +69,7 @@ public class Boid : MonoBehaviour
             timer = 0f;
         }
 
+        //Act as though the fish has been hooked
         if (hooked)
         {
             //Get the vector that points from the player to the fish
@@ -74,20 +77,17 @@ public class Boid : MonoBehaviour
 
             float angle = Vector3.Angle(transform.forward, dir);
 
-            //Debug.Log(angle);
 
-
-            if(angle < 90)
+            if (angle < 90)
             {
                 dir = rodTip.transform.position - transform.position;
 
                 newRotation = LookAt(dir);
             }
-
-
             transform.position = hook.transform.position;
 
         }
+        //Look at the target
         else if (targetMode)
         {
             //Get the vector that points from the fish to the target
@@ -98,17 +98,23 @@ public class Boid : MonoBehaviour
 
         transform.rotation = Quaternion.RotateTowards(transform.rotation, newRotation, maxSteer);
 
-        if (Vector3.Angle(hook.transform.position - transform.position, transform.forward) > viewAngle)
+        //Check if the hook is in view
+        if (Vector3.Angle(hook.transform.position - transform.position, transform.forward) < viewAngle)
         {
             RaycastHit hit;
             if (Physics.Raycast(transform.position, hook.transform.position - transform.position, out hit, 10f))
             {
 
-                Debug.DrawRay(transform.position, transform.position - hook.transform.position, Color.magenta);
+                Debug.DrawRay(transform.position, hook.transform.position - transform.position, Color.magenta);
 
                 if (hit.collider.gameObject.CompareTag("Hook"))
                 {
                     target.transform.position = hook.transform.position;
+
+                    Vector3 dir = transform.position - target.transform.position;
+
+                    newRotation = LookAt(dir);
+
                     targetMode = true;
                 }
             }
@@ -118,16 +124,20 @@ public class Boid : MonoBehaviour
             }
         }
 
+        //Look at all of this boids neighbors
         CheckAllBoids();
 
+        //Apply gravity
         if (transform.position.y > 0)
         {
             rb.AddForce(-Vector3.up * 9.81f * 50 * Time.fixedDeltaTime);
         }
+        //Apply the force of the fish to the hook
         else if(hooked)
         {
             hook.GetComponent<Rigidbody>().AddForce(transform.forward * speed * speed * Time.fixedDeltaTime);
         }
+        //Apply the force of the fish to the fish
         else
         {
             rb.AddForce(transform.forward * speed * speed * Time.fixedDeltaTime);
@@ -174,15 +184,17 @@ public class Boid : MonoBehaviour
 
     void NewSpeedAndDirection()
     {
-
+        //New random speed
         speed = Random.Range(minSpeed, maxSpeed);
+        //Clamps and augments the speed
         if (hooked)
         {
+            //If 1<speed<4 then set speed to 4
             if(speed > 1 && speed < 4)
             {
                 speed = 4;
             }
-
+            //Gives fish a speed boost
             if (speed >= maxSpeed - 3f)
             {
                 speed = maxSpeed * 5f;
@@ -190,16 +202,18 @@ public class Boid : MonoBehaviour
         }
         else
         {
+            //Makes the fish a little slower and more languid
             if (speed > 1 && speed < 5)
             {
                 speed = 0;
             }
+            //Ocassionally give fish a huge burst of speed
             if (speed >= maxSpeed - .5f)
             {
                 speed = maxSpeed * 10f;
             }
         }
-        //speed = 0;
+        //If the fish is not targeting anything, then get a new rotation
         if (!targetMode)
         {
             Quaternion newYaw = Quaternion.identity;
@@ -225,6 +239,7 @@ public class Boid : MonoBehaviour
         }
     }
 
+    //Perform all boids calculations on the fish
     void CheckAllBoids()
     {
         Vector3 center = Vector3.zero;
@@ -258,14 +273,20 @@ public class Boid : MonoBehaviour
         boidCount = 0;
     }
 
+    //Separate the fish
     private void Separation(GameObject boid)
     {
         Vector3 dist = transform.position - boid.transform.position;
 
+        if(dist.magnitude > separationRadius)
+        {
+            return;
+        }
+
         float magnitude = dist.magnitude;
         dist.Normalize();
-        //dist *= (1 /  magnitude) * separationRadius;
-        /*
+        dist *= (1 /  magnitude) * separationRadius;
+        
         magnitude /= separationRadius;
         if(magnitude > 1)
         {
@@ -278,7 +299,7 @@ public class Boid : MonoBehaviour
         {
             magnitude *= -1;
         }
-        */
+        
 
         magnitude *= maxSeparationForce;
 
@@ -297,7 +318,7 @@ public class Boid : MonoBehaviour
         rb.AddForce(dist * 50 * Time.fixedDeltaTime);
     }
 
-
+    //Pull the fish together
     private void Cohesion(Vector3 center)
     {
         Vector3 dir = center - transform.position;
@@ -305,7 +326,7 @@ public class Boid : MonoBehaviour
         
         float magnitude = dir.magnitude;
         dir.Normalize();
-        /*
+        
         magnitude /= separationRadius;
         if (magnitude > 1)
         {
@@ -314,11 +335,13 @@ public class Boid : MonoBehaviour
 
         magnitude = Mathf.Cos(magnitude);
 
+        /*
         if (magnitude < 0)
         {
             magnitude *= 0;
         }
         */
+
         magnitude *= maxCohesionForce;
         
         dir *= magnitude;
@@ -326,6 +349,7 @@ public class Boid : MonoBehaviour
         rb.AddForce(dir * 50 * Time.fixedDeltaTime);
     }
 
+    //Make the fish look in the same direction
     private void Alignment(Vector3 heading)
     {
         heading *= maxAlignmentForce;

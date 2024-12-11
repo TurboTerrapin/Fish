@@ -34,6 +34,7 @@ public class Hook : MonoBehaviour
             }
             else
             {
+                hookRB.AddForce(Vector3.up * -.05f * 50 * Time.fixedDeltaTime);
                 hookRB.AddForce(-hookRB.velocity.normalized * hookRB.velocity.sqrMagnitude * Time.fixedDeltaTime * 50);
             }
         }
