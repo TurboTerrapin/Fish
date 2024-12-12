@@ -1558,7 +1558,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fish: []
-  fishPrefab: {fileID: 6090586296630657682, guid: b1f8b6a540136f04eb78c78463481303, type: 3}
+  fishPrefab: {fileID: 3266913018512855026, guid: e50eaebe7cd86794c89fe4e25d35f7cb, type: 3}
   hook: {fileID: 776207282}
   justLanded: 0
   canLand: 1
@@ -1619,6 +1619,7 @@ MonoBehaviour:
   growing: 1
   isReeling: 0
   justReturned: 0
+  lockedBail: 1
   lineController: {fileID: 1093549129}
   timer: 0
 --- !u!136 &1093549124
