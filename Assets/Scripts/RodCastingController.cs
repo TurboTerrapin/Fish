@@ -31,6 +31,18 @@ public class RodCastingController : MonoBehaviour
     {
 
         Vector3 dir = rodTip.transform.position - hook.transform.position;
+        
+        if (Input.GetMouseButton(0))
+        {
+            if (isReeling)
+            {
+                Reel();
+            }
+            else
+            {
+                WindUp();
+            }
+        }
         if (Input.GetMouseButtonUp(0))
         {
             if (justReturned)
@@ -41,17 +53,6 @@ public class RodCastingController : MonoBehaviour
             {
                 Cast();
                 lineController.Cast();
-            }
-        }
-        if (Input.GetMouseButton(0))
-        {
-            if (isReeling)
-            {
-                Reel();
-            }
-            else
-            {
-                WindUp();
             }
         }
         else if (hook.GetComponent<Hook>().landed && !lockedBail && dir.magnitude > lineController.length + 1.5)
